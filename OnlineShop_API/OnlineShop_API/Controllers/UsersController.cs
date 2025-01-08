@@ -178,6 +178,45 @@ namespace OnlineShop_API.Controllers
 
             return Ok(orders);
         }
+        [HttpGet("profile")]
+        [Authorize]  // Endast inloggade användare kan komma åt denna
+        public async Task<ActionResult<UserDto>> GetUserProfile()
+        {
+            // Hämta användarens ID från token (NameIdentifier)
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null)
+            {
+                return Unauthorized(); // Om användarens ID inte finns i token, returnera 401
+            }
+
+            // Försök att konvertera userId till en int
+            if (!int.TryParse(userId, out int parsedUserId))
+            {
+                return BadRequest("Invalid user ID in token.");
+            }
+
+            // Hämta användaren från databasen baserat på användarens ID (nu som int)
+            var user = await _context.Users.FindAsync(parsedUserId);
+            if (user == null)
+            {
+                return NotFound(); // Om användaren inte finns, returnera 404
+            }
+
+            // Mappa användardata från User till UserDto
+            var userDto = new UserDto
+            {
+                Name = user.Name,
+                Address = user.Address,
+                Mobile = user.Mobile,
+                City = user.City,
+                Zipcode = user.Zipcode
+            };
+
+            // Returnera den mappade användardatan
+            return Ok(userDto);
+        }
+
+
 
         // Helper methods
         private string HashPassword(string password)

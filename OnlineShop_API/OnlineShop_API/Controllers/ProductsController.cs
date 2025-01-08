@@ -61,6 +61,7 @@ namespace OnlineShop_API.Controllers
             // Skapa DTO-svar
             var responseDto = new ProductsDto
             {
+                Id = product.Id,
                 Name = product.Name,
                 Description = product.Description,
                 Price = product.Price,

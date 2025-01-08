@@ -34,10 +34,12 @@ namespace OnlineShop_API.Controllers
             {
                 Category = new CategoryDto
                 {
+                    Id = c.Id,
                     Name = c.Name
                 },
                 SubCategories = c.SubCategories.Select(sc => new SubCategoryDto
                 {
+                
                     Name = sc.Name
                 }).ToList()
             }).ToList();
