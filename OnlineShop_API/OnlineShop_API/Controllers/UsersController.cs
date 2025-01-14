@@ -176,8 +176,22 @@ namespace OnlineShop_API.Controllers
                 .Include(o => o.OrderItems) // Inkludera orderartiklar
                 .ToList();
 
-            return Ok(orders);
+            var orderDtos = orders.Select(o => new OrderDto
+            {
+                Id = o.Id,
+                OrderDate = o.OrderDate,
+                OrderItems = o.OrderItems.Select(oi => new OrderItemDto
+                {
+                    Id = oi.Id,
+                    ProductId = oi.ProductId,
+                    Quantity = oi.Quantity
+                }).ToList()
+            }).ToList();
+
+            return Ok(orderDtos);
         }
+
+
         [HttpGet("profile")]
         [Authorize]  // Endast inloggade användare kan komma åt denna
         public async Task<ActionResult<UserDto>> GetUserProfile()
@@ -209,7 +223,8 @@ namespace OnlineShop_API.Controllers
                 Address = user.Address,
                 Mobile = user.Mobile,
                 City = user.City,
-                Zipcode = user.Zipcode
+                Zipcode = user.Zipcode,
+                IsAdmin = user.IsAdmin
             };
 
             // Returnera den mappade användardatan
