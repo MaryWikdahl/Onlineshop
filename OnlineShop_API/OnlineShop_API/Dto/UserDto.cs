@@ -22,5 +22,8 @@ namespace OnlineShop_API.Dto
         [Required]
         [StringLength(10, ErrorMessage = "Zipcode cannot exceed 10 characters.")]
         public string Zipcode { get; set; } // Postnummer
+
+        [Required]
+        public bool IsAdmin { get; set; } // Admin
     }
 }

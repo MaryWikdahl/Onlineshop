@@ -3,7 +3,10 @@
 namespace OnlineShop_API.Dto
 {
     public class OrderItemDto
+
     {
+        [Required]
+        public int Id { get; set; }
         [Required]
         public int ProductId { get; set; } // Produktens ID
 
