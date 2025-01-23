@@ -179,6 +179,7 @@ namespace OnlineShop_API.Controllers
             var orderDtos = orders.Select(o => new OrderDto
             {
                 Id = o.Id,
+                Status = o.Status.ToString(),
                 OrderDate = o.OrderDate,
                 OrderItems = o.OrderItems.Select(oi => new OrderItemDto
                 {

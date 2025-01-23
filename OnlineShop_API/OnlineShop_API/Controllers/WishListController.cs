@@ -98,6 +98,7 @@ namespace OnlineShop_API.Controllers
                 .Where(p => wishlistItems.Contains(p.Id))
                 .Select(p => new ProductsDto
                 {
+                    Id = p.Id,
                     Name = p.Name,
                     Description = p.Description,
                     Price = p.Price,
