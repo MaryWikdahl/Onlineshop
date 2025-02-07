@@ -24,6 +24,7 @@ namespace OnlineShop_API.Controllers
         }
 
         // POST: api/orders
+        // POST: api/orders
         [HttpPost]
         [Authorize]
         public async Task<ActionResult<OrderCreatedDto>> CreateOrder([FromBody] OrderCreateDto orderCreateDto)
@@ -47,10 +48,18 @@ namespace OnlineShop_API.Controllers
             foreach (var item in orderCreateDto.OrderItems)
             {
                 var product = await _context.Products.FindAsync(item.ProductId);
-                if (product == null || product.StockQuantity < item.Quantity)
+                if (product == null)
                 {
-                    return BadRequest($"Product with ID {item.ProductId} not found or insufficient stock.");
+                    return BadRequest($"Product with ID {item.ProductId} not found.");
                 }
+
+                if (product.StockQuantity < item.Quantity)
+                {
+                    return BadRequest($"Insufficient stock for product with ID {item.ProductId}. Available: {product.StockQuantity}, requested: {item.Quantity}.");
+                }
+
+                // Minska lagersaldot
+                product.StockQuantity -= item.Quantity;
 
                 var orderItem = new OrderItems
                 {
@@ -167,50 +176,131 @@ namespace OnlineShop_API.Controllers
         }
 
         // PUT: api/orders/{id}
+        // PUT: api/orders/{id}
         [HttpPut("{id}")]
         [Authorize(Policy = IdentityData.AdminUserPolicyName)] // Endast administratörer kan uppdatera order
         public async Task<IActionResult> UpdateOrder(int id, [FromBody] OrderCreateDto orderUpdateDto)
         {
-            var order = await _context.Orders.Include(o => o.OrderItems).FirstOrDefaultAsync(o => o.Id == id);
+            var order = await _context.Orders
+                .Include(o => o.OrderItems)
+                .FirstOrDefaultAsync(o => o.Id == id);
 
             if (order == null)
             {
                 return NotFound();
             }
 
+            // Spåra nuvarande orderitems
+            var currentOrderItems = order.OrderItems.ToList();
+
+            // Öka lagersaldot för produkter som tas bort eller vars kvantitet minskar
+            foreach (var existingItem in currentOrderItems)
+            {
+                var matchingItem = orderUpdateDto.OrderItems.FirstOrDefault(i => i.ProductId == existingItem.ProductId);
+                var product = await _context.Products.FindAsync(existingItem.ProductId);
+
+                if (product == null) continue;
+
+                if (matchingItem == null)
+                {
+                    // Produkten tas bort från ordern, återställ hela kvantiteten
+                    product.StockQuantity += existingItem.Quantity;
+                }
+                else if (existingItem.Quantity > matchingItem.Quantity)
+                {
+                    // Kvantiteten minskar, återställ skillnaden
+                    product.StockQuantity += (existingItem.Quantity - matchingItem.Quantity);
+                }
+            }
+
+            // Minska lagersaldot för produkter som läggs till eller vars kvantitet ökar
+            foreach (var updatedItem in orderUpdateDto.OrderItems)
+            {
+                var existingItem = currentOrderItems.FirstOrDefault(i => i.ProductId == updatedItem.ProductId);
+                var product = await _context.Products.FindAsync(updatedItem.ProductId);
+
+                if (product == null)
+                {
+                    return BadRequest($"Product with ID {updatedItem.ProductId} not found.");
+                }
+
+                if (existingItem == null)
+                {
+                    // Produkten är ny i ordern, minska hela kvantiteten
+                    if (product.StockQuantity < updatedItem.Quantity)
+                    {
+                        return BadRequest($"Insufficient stock for product with ID {updatedItem.ProductId}.");
+                    }
+
+                    product.StockQuantity -= updatedItem.Quantity;
+                }
+                else if (updatedItem.Quantity > existingItem.Quantity)
+                {
+                    // Kvantiteten ökar, minska skillnaden
+                    var difference = updatedItem.Quantity - existingItem.Quantity;
+
+                    if (product.StockQuantity < difference)
+                    {
+                        return BadRequest($"Insufficient stock for product with ID {updatedItem.ProductId}.");
+                    }
+
+                    product.StockQuantity -= difference;
+                }
+            }
+
+            // Uppdatera orderitems
             order.OrderItems.Clear();
-            foreach (var item in orderUpdateDto.OrderItems)
+            foreach (var updatedItem in orderUpdateDto.OrderItems)
             {
                 var newItem = new OrderItems
                 {
-                    ProductId = item.ProductId,
-                    Quantity = item.Quantity,
+                    ProductId = updatedItem.ProductId,
+                    Quantity = updatedItem.Quantity,
                     OrderId = order.Id
                 };
                 order.OrderItems.Add(newItem);
             }
 
+            // Uppdatera totalbeloppet
             order.TotalAmount = order.OrderItems.Sum(oi => oi.Quantity * _context.Products.First(p => p.Id == oi.ProductId).Price);
+
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
+
+        // DELETE: api/orders/{id}
         // DELETE: api/orders/{id}
         [HttpDelete("{id}")]
         [Authorize(Policy = IdentityData.AdminUserPolicyName)] // Endast administratörer kan ta bort order
         public async Task<IActionResult> DeleteOrder(int id)
         {
-            var order = await _context.Orders.FindAsync(id);
+            var order = await _context.Orders
+                .Include(o => o.OrderItems) // Inkludera orderitems för att kunna hantera lager
+                .FirstOrDefaultAsync(o => o.Id == id);
+
             if (order == null)
             {
                 return NotFound();
             }
 
+            // Återställ lagersaldot för varje produkt i ordern
+            foreach (var orderItem in order.OrderItems)
+            {
+                var product = await _context.Products.FindAsync(orderItem.ProductId);
+                if (product != null)
+                {
+                    product.StockQuantity += orderItem.Quantity;
+                }
+            }
+
+            // Ta bort ordern
             _context.Orders.Remove(order);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
+
     }
 }

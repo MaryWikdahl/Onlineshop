@@ -130,6 +130,35 @@ namespace OnlineShop_API.Controllers
             _context.SaveChanges(); // Spara ändringarna i databasen
             return Ok("Profile updated successfully."); // Returnera framgångsmeddelande
         }
+        [HttpPut("profile/{id}")]
+        [Authorize(Policy = IdentityData.AdminUserPolicyName)]
+        public IActionResult UpdateProfile(int id, [FromBody] UserDto updatedUser)
+        {
+            if (updatedUser == null)
+            {
+                return BadRequest("User data is required.");
+            }
+
+            var user = _context.Users.Find(id);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            user.Name = updatedUser.Name;
+            user.Address = updatedUser.Address;
+            user.Mobile = updatedUser.Mobile;
+            user.City = updatedUser.City;
+            user.Zipcode = updatedUser.Zipcode;
+
+            _context.SaveChanges();
+
+            // Skicka ett JSON-objekt istället för en enkel sträng
+            return Ok(new { message = "Profile updated successfully." });
+        }
+
+
         [HttpPut("change-password")]
         [Authorize]
         public IActionResult ChangePassword([FromBody] ChangePasswordDto changePasswordDto)
@@ -190,6 +219,32 @@ namespace OnlineShop_API.Controllers
             }).ToList();
 
             return Ok(orderDtos);
+        }
+        // DELETE: api/users/{id}
+        [HttpDelete("{id}")]
+        [Authorize(Policy = IdentityData.AdminUserPolicyName)]
+        public IActionResult DeleteUser(int id)
+        {
+            // Hämta användaren med det specificerade ID:t
+            var user = _context.Users.Find(id);
+
+            if (user == null)
+            {
+                return NotFound(new { message = "User not found." });
+            }
+
+            // Säkerställ att en admin inte försöker ta bort sig själv
+            var currentUserId = GetCurrentUserId();
+            if (user.Id == currentUserId)
+            {
+                return BadRequest(new { message = "Admins cannot delete themselves." });
+            }
+
+            // Ta bort användaren från databasen
+            _context.Users.Remove(user);
+            _context.SaveChanges();
+
+            return Ok(new { message = "User deleted successfully." });
         }
 
 

@@ -31,8 +31,10 @@ namespace OnlineShop_API.Controllers
                     r.Id,
                     r.Rating,
                     r.Comment,
+                    r.CreatedAt,
                     UserId = r.UserId, // Inkludera användarens ID
                     UserName = _context.Users.FirstOrDefault(u => u.Id == r.UserId).Name // Hämta användarens namn
+                   
                 })
                 .ToListAsync();
 
@@ -51,12 +53,22 @@ namespace OnlineShop_API.Controllers
 
             var userId = GetCurrentUserId(); // Hämta den aktuella användarens ID
 
+            // Kontrollera om användaren redan har postat en recension för denna produkt
+            var existingReview = await _context.Reviews
+                .FirstOrDefaultAsync(r => r.ProductId == productId && r.UserId == userId);
+
+            if (existingReview != null)
+            {
+                return Conflict("Du har redan postat en recension för denna produkt.");
+            }
+
             var review = new Reviews
             {
                 ProductId = productId,
                 UserId = userId, // Sätt användarens ID
                 Rating = reviewDto.Rating,
-                Comment = reviewDto.Comment
+                Comment = reviewDto.Comment,
+                CreatedAt = DateTime.UtcNow // Sätt aktuell tid som skapandetid
             };
 
             _context.Reviews.Add(review);

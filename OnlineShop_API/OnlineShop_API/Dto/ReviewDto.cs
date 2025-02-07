@@ -12,6 +12,8 @@ namespace OnlineShop_API.DTOs
         [StringLength(500, ErrorMessage = "Comment cannot be longer than 500 characters.")]
         public string Comment { get; set; }
 
-       
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
+
+
     }
 }
