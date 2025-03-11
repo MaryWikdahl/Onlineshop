@@ -1,0 +1,192 @@
+@import './base.css';
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+#app {
+  font-family: 'Poppins', sans-serif;
+ 
+}
+.main-btn{
+user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+   border-radius: 10px ;
+   padding: 10px 15px;
+   font-weight: bold;
+  font-size: 12px;
+  border:none;
+  background-color: var(--mainblue);
+  color:rgb(252, 252, 247);
+  cursor: pointer;
+}
+.cart-btn{
+  user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+    width: 100%;
+     padding: 10px 15px;
+     font-weight: bold;
+    font-size: 20px;
+    border:none;
+    background-color: #333;
+    color:rgb(252, 252, 247);
+    cursor: pointer;
+  }
+.secondary-btn{
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+   border-radius: 10px ;
+   padding: 10px 15px;
+   font-weight: bold;
+  font-size: 12px;
+  border:var(--mediumgreen) 4px solid ;
+  background-color: var(--lightgreen);
+  background-color: var(--mediumgreen);
+  border-color: var(--mediumgreen);
+  border-color: var(--lightbeige);
+  color:rgb(252, 252, 247);
+  cursor: pointer;
+
+}
+.heart-button {
+  border: none;
+  background: none;
+  color: rgba(0, 0, 0, 0.178);
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.heart-button:hover {
+  background: none;
+  color: #ff4081;
+}
+
+/* Ikon i knappen */
+.heart-button i {
+  font-size: 20px;
+}
+.nobtn-btn{
+  background-color: Transparent;
+  background-repeat:no-repeat;
+  border: none;
+  cursor:pointer;
+  overflow: hidden; 
+}
+.Container{
+    margin: 0 auto;
+    padding: 0 2rem;
+    max-width: 1480px;
+    margin-top: 10rem;
+    align-items: center;
+   
+}
+.grid{
+  display: grid;
+  
+}
+.grid-item-four {
+  display: grid;
+  grid-template-areas:
+    'item1 item2'
+    'item4m3 ite';
+
+}
+.grid-item-two{
+  gap: 30px;
+  display: grid;
+  padding: 10px;
+  grid-template-columns: repeat(2, 1fr) !important;
+}
+.shoppingItem{
+  padding: 20px;
+  background-color: #a8b1ff;;
+  grid-column: span 1 ;
+}
+.shopItem{
+  padding: 1rem;
+  
+}
+.checkOut{
+  max-width: 30rem;
+  grid-column: span 1 ;
+
+ }
+ .bamba{
+  text-align: center;
+  grid-column: span 1;
+ }
+
+p:nth-child(1) {
+  grid-area: item1;
+}
+
+p:nth-child(2) {
+  grid-area: item2;
+}
+
+p:nth-child(3) {
+  grid-area: item3;
+}
+
+p:nth-child(4) {
+  grid-area: item4;
+}
+a:link,  a:visited {
+    color: black;
+    background-color: transparent;
+    text-decoration: none;
+  }
+  
+  .fix{
+    position: absolute;
+    top: 30px;
+    left: 500px;
+  }
+  /* om fix ej funkar */
+  .fixed{
+    position: absolute;
+    top: 180px;
+    left: 500px;
+    height: 1300px;
+    width: 1300px;
+  }
+.d-flex{
+  display: flex;
+}
+.column{
+  display: flex;
+  flex-direction: column;
+}
+.align-items-center{
+  text-align: center;
+  align-items: center;
+}
+.col-md-3{
+  display:inline-block
+}
+.grid-item {
+  width: 25rem;
+  height: 30rem;
+  padding: 0px 5px
+}
+.box {
+  border: 0px;
+  margin: 0px;
+  display: inline-block;
+  width: 30rem; /* Justera bredden efter dina behov */
+  box-sizing: border-box; /* Förhindra extra marginaler */
+}
+.price{
+  margin-top: 2rem;
+font-size: 20px;
+  
+}
+.margin-top{
+  margin-top: 2rem;
+  
+}

@@ -1,0 +1,35 @@
+
+@import './style.css';
+@import url('https://fonts.googleapis.com/css2?family=Oswald&display=swap');
+body {
+  background-color: #fffafa;
+  min-height: 100vh;
+  transition: color 0.5s, background-color 0.5s;
+  line-height: 1.6;
+  font-family:'Oswald', sans-serif;
+
+
+ 
+}
+:root {
+  --bg-shape-color:linear-gradient(120deg,  #343A4F, #0F1620) ;
+  --bg-shape-color-secondary:linear-gradient(120deg,  #443e32, #140202) ;
+ 
+
+  --mainblue: #e53770;
+ --darkblue: #ee4a4a;
+ --eggshell:#FCF9F6;
+ --lightersand:#f1e9da;
+ --lightsand: #E7D8BD;
+ --greenbeige:#D4C9A0;
+ --darkbrown:#2C2820;
+ --darkerbrown:#090101;
+ --mediumbrown: #6F6450;
+ --lightergreen:#DFDFBA;
+ --lightgreen:#f2f2e2;
+ --mediumgreen:#CAC98D;
+ --darkgreen:#84844E;
+ 
+ 
+ 
+}
